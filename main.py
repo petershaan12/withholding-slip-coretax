@@ -11,13 +11,26 @@ def prompt_target_period(settings) -> None:
 
 
 def main() -> None:
+    run_app(prompt_period=True, prompt_before_close=True)
+
+
+def run_app(
+    target_period: str | None = None,
+    *,
+    prompt_period: bool = False,
+    prompt_before_close: bool = False,
+) -> int:
     from core.settings import settings
     from services.auth_service import login
     from services.download_service import search_and_download, wait_for_downloads
     from services.navigation_service import navigate_to_withholding
     from utils.driver_utils import create_driver
 
-    prompt_target_period(settings)
+    if target_period:
+        settings.set_target_period(target_period)
+    elif prompt_period:
+        prompt_target_period(settings)
+
     settings.display()
 
     driver = None
@@ -25,9 +38,9 @@ def main() -> None:
         driver = create_driver()
 
         if not login(driver):
-            return
+            return 1
         if not navigate_to_withholding(driver):
-            return
+            return 1
 
         count = search_and_download(driver)
 
@@ -37,11 +50,14 @@ def main() -> None:
         else:
             log.warning("Tidak ada file yang didownload.")
 
+        return 0
     except Exception as exc:
         log.error("Error tidak terduga: %s", exc, exc_info=True)
+        return 1
     finally:
         if driver:
-            input("\nTekan Enter untuk menutup browser...")
+            if prompt_before_close:
+                input("\nTekan Enter untuk menutup browser...")
             driver.quit()
             log.info("Browser ditutup.")
 

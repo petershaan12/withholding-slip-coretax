@@ -1,84 +1,68 @@
 # Withholding Slip Coretax
 
-Tool ini dipakai untuk login ke Coretax DJP, mengganti tenant bila perlu, lalu mengunduh bukti potong PDF untuk periode yang dipilih.
+Tool GUI untuk login ke Coretax DJP dan download bukti potong PDF berdasarkan periode.
 
-## Cara pakai untuk user
+## Untuk Build .exe
 
-1. Extract folder aplikasi.
-2. Buka file `config.json`.
-3. Isi `nik` dan `password`.
-4. Pastikan `tenant_name` dan `tenant_npwp` sesuai.
-5. Jalankan setup sekali:
-   - Windows: `setup_windows.bat`
-   - macOS: `setup_mac.command`
-6. Setelah setup selesai, jalankan:
-   - Windows: `run_windows.bat`
-   - macOS: `run_mac.command`
-7. Saat diminta, masukkan periode bulan.
-8. Browser akan terbuka. Selesaikan ALTCHA dan klik login bila masih diminta.
-9. Setelah login sukses, aplikasi lanjut otomatis ke proses download.
+Build harus dilakukan dari Windows, bukan WSL, supaya hasilnya benar-benar file `.exe`.
 
-## File penting
+Yang perlu ada di laptop build:
 
-- `config.json`: konfigurasi yang dipakai aplikasi.
-- `config.template.json`: template jika ingin membuat ulang `config.json`.
-- `run_windows.bat`: launcher untuk Windows.
-- `run_mac.command`: launcher untuk macOS.
-- `setup_windows.bat`: setup dependency untuk Windows.
-- `setup_mac.command`: setup dependency untuk macOS.
-- `.session/coretax_cookies.json`: session cookies lokal agar tidak login terus-menerus.
+- Python 3 Windows dari python.org
+- Opsi "Add Python to PATH" aktif saat install Python
+- Google Chrome
+- Internet untuk download dependency saat build pertama
 
-## Contoh `config.json`
+Langkah build:
 
-```json
-{
-  "nik": "3515xxxxxxxxxxxx",
-  "password": "isi_password_di_sini",
-  "url": "https://coretaxdjp.pajak.go.id/identityproviderportal/Account/Login",
-  "target_period": "Januari 2026",
-  "tenant_name": "CYBERINDO MEGA PERSADA",
-  "tenant_npwp": "0032779977063000",
-  "download_dir": "",
-  "chromedriver_path": "",
-  "browser_headless": false,
-  "selenium_timeout": 20,
-  "captcha_retry": 5
-}
+1. Extract source project ini di Windows.
+2. Double click `build_windows.bat`.
+3. Tunggu sampai muncul pesan build selesai.
+4. Folder siap kirim ada di:
+
+```text
+finance-release\CoretaxSlip
 ```
 
-## Keterangan field
+Zip folder `CoretaxSlip` itu lalu kirim ke tim finance.
 
-- `nik`: NIK login Coretax.
-- `password`: password login Coretax.
-- `url`: URL halaman login.
-- `target_period`: default periode bila user langsung tekan Enter saat prompt.
-- `tenant_name`: nama tenant/perwakilan yang harus aktif setelah login.
-- `tenant_npwp`: NPWP tenant/perwakilan yang harus aktif setelah login.
-- `download_dir`: folder hasil download. Jika kosong, default ke `~/Downloads/CoretaxSlips`.
-- `chromedriver_path`: opsional. Kosongkan jika ingin auto-detect.
-- `browser_headless`: sebaiknya tetap `false` karena login butuh interaksi ALTCHA.
-- `selenium_timeout`: timeout Selenium dalam detik.
-- `captcha_retry`: saat ini hanya dipakai sebagai setting kompatibilitas.
+## Untuk Tim Finance
 
-## Perilaku aplikasi
+Finance tidak perlu install Python.
 
-- Mengisi username dan password otomatis.
-- Mencoba memulihkan session cookies lama.
-- Jika session masih valid, login bisa terlewati.
-- Jika tenant aktif belum benar, aplikasi mencoba mengganti ke tenant target.
-- Setelah sukses, session cookies disimpan lagi untuk run berikutnya.
+Yang perlu ada di komputer finance:
 
-## Catatan distribusi
+- Google Chrome
 
-- `config.json` berisi kredensial. Jangan commit ke repository publik.
-- `run_mac.command` mungkin perlu izin execute sekali di macOS.
-- Build tetap Python-based, jadi mesin tujuan harus punya Python 3.
-- Jalankan setup sekali sebelum run pertama.
+Cara pakai:
 
-## Troubleshooting
+1. Extract folder `CoretaxSlip` yang dikirim.
+2. Jalankan `CoretaxSlip.exe`.
+3. Isi NIK, password, periode, tenant name, dan tenant NPWP di form aplikasi.
+4. Klik `Mulai Download`.
+5. Selesaikan ALTCHA/login di Chrome jika diminta.
 
-- Jika `config.json` belum ada, salin `config.template.json` menjadi `config.json`.
-- Jika muncul `No module named 'selenium'`, berarti setup belum dijalankan atau `venv` rusak. Jalankan `setup_mac.command` atau `setup_windows.bat`.
-- Jika Chrome tidak terbuka, kosongkan `chromedriver_path` dulu.
-- Jika tenant tidak terganti, cek `tenant_name` dan `tenant_npwp`.
-- Jika login diminta lagi, kemungkinan session cookies sudah expired.
+Hasil PDF default tersimpan di:
+
+```text
+Downloads\CoretaxSlips
+```
+
+## File Penting
+
+- `build_windows.bat`: dipakai developer/admin untuk membuat `.exe`.
+- `config.template.json`: template konfigurasi.
+- `config.json`: konfigurasi yang otomatis disimpan aplikasi setelah form diisi.
+- `CoretaxSlip.exe`: aplikasi yang dijalankan finance.
+
+## Field Opsional
+
+- `Download Folder`: boleh dikosongkan. Jika kosong, hasil PDF masuk ke `Downloads\CoretaxSlips`.
+- `ChromeDriver Path`: boleh dikosongkan. Isi hanya kalau ChromeDriver auto-detect gagal dan IT memberi file `chromedriver.exe`.
+
+## Catatan
+
+- Jangan kirim/share `config.json` yang sudah berisi password.
+- Jangan kirim source project ke finance; cukup kirim folder `finance-release\CoretaxSlip` hasil build.
+- Jika build gagal karena `py` tidak dikenali, install ulang Python Windows dan centang "Add Python to PATH".
+- Aplikasi tetap butuh Chrome karena login Coretax memakai browser.

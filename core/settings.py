@@ -1,10 +1,15 @@
 import json
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Optional
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = (
+    Path(sys.executable).resolve().parent
+    if getattr(sys, "frozen", False)
+    else Path(__file__).resolve().parent.parent
+)
 CONFIG_FILE = BASE_DIR / "config.json"
 CONFIG_TEMPLATE_FILE = BASE_DIR / "config.template.json"
 
@@ -71,6 +76,9 @@ class Settings:
         self.session_file.parent.mkdir(parents=True, exist_ok=True)
 
     def display(self) -> None:
+        if getattr(sys, "stdout", None) is None:
+            return
+
         nik_masked = self.nik[:4] + "*" * (len(self.nik) - 4)
         lines = [
             ("URL", self.url),
