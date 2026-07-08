@@ -1,0 +1,13 @@
+{
+  "nik": "3515xxxxxxxxxxxx",
+  "password": "isi_password_di_sini",
+  "url": "https://coretaxdjp.pajak.go.id/identityproviderportal/Account/Login",
+  "target_period": "Januari 2026",
+  "tenant_name": "CYBERINDO MEGA PERSADA",
+  "tenant_npwp": "0032779977063000",
+  "download_dir": "",
+  "chromedriver_path": "",
+  "browser_headless": false,
+  "selenium_timeout": 20,
+  "captcha_retry": 5
+}

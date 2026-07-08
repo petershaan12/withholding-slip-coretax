@@ -5,7 +5,6 @@ __pycache__/
 *.log
 
 # Environments
-.env
 .venv
 env/
 venv/
@@ -21,3 +20,9 @@ venv.bak/
 # IDE
 .vscode/
 .idea/
+
+# Local session state
+.session/
+
+# User config
+config.json

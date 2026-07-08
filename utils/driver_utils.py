@@ -1,27 +1,50 @@
-import base64
-from io import BytesIO
+import platform
+from pathlib import Path
+from shutil import which
 
-from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 
 from core.settings import settings
 
 
-def element_to_base64(driver: webdriver.Chrome, selector: str) -> str:
-    """Screenshot elemen dan kembalikan sebagai data URL base64."""
-    el = driver.find_element(By.CSS_SELECTOR, selector)
-    img = Image.open(BytesIO(el.screenshot_as_png))
-    buf = BytesIO()
-    img.save(buf, format="PNG")
-    b64 = base64.b64encode(buf.getvalue()).decode()
-    return f"data:image/png;base64,{b64}"
+def _resolve_chrome_binary() -> str | None:
+    candidates: list[str] = []
+
+    if platform.system() == "Darwin":
+        candidates.extend(
+            [
+                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                str(Path.home() / "Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+            ]
+        )
+    elif platform.system() == "Windows":
+        candidates.extend(
+            [
+                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+            ]
+        )
+
+    for name in ("google-chrome", "chrome", "chromium", "chromium-browser"):
+        found = which(name)
+        if found:
+            candidates.append(found)
+
+    for candidate in candidates:
+        if candidate and Path(candidate).is_file():
+            return candidate
+
+    return None
 
 
 def create_driver() -> webdriver.Chrome:
     opts = Options()
+    chrome_binary = _resolve_chrome_binary()
+    if chrome_binary:
+        opts.binary_location = chrome_binary
+
     if settings.browser_headless:
         opts.add_argument("--headless=new")
     opts.add_argument("--no-sandbox")
@@ -39,5 +62,11 @@ def create_driver() -> webdriver.Chrome:
             "safebrowsing.enabled": True,
         },
     )
-    service = Service(settings.chromedriver_path)
-    return webdriver.Chrome(service=service, options=opts)
+    driver_path = settings.chromedriver_path
+    if driver_path:
+        candidate = Path(driver_path).expanduser()
+        if candidate.is_file():
+            service = Service(str(candidate))
+            return webdriver.Chrome(service=service, options=opts)
+
+    return webdriver.Chrome(options=opts)
