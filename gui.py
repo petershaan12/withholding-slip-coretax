@@ -28,7 +28,6 @@ DEFAULT_CONFIG = {
     "tenant_name": "",
     "tenant_npwp": "",
     "download_dir": "",
-    "chromedriver_path": "",
     "browser_headless": False,
     "selenium_timeout": 20,
     "captcha_retry": 5,
@@ -90,7 +89,6 @@ class CoretaxApp:
             "tenant_name": StringVar(value=self.config_data.get("tenant_name", "")),
             "tenant_npwp": StringVar(value=self.config_data.get("tenant_npwp", "")),
             "download_dir": StringVar(value=self.config_data.get("download_dir", "")),
-            "chromedriver_path": StringVar(value=self.config_data.get("chromedriver_path", "")),
         }
 
         self.start_button = None
@@ -112,7 +110,7 @@ class CoretaxApp:
         body = ttk.Frame(self.root, padding=(18, 8, 18, 12))
         body.grid(row=1, column=0, sticky="nsew")
         body.columnconfigure(1, weight=1)
-        body.rowconfigure(8, weight=1)
+        body.rowconfigure(7, weight=1)
 
         self._entry(body, "NIK", "nik", 0)
         self._entry(body, "Password", "password", 1, show="*")
@@ -120,18 +118,17 @@ class CoretaxApp:
         self._entry(body, "Tenant Name", "tenant_name", 3)
         self._entry(body, "Tenant NPWP", "tenant_npwp", 4)
         self._path_entry(body, "Download Folder (opsional)", "download_dir", 5, self._browse_download_dir)
-        self._path_entry(body, "ChromeDriver Path (opsional)", "chromedriver_path", 6, self._browse_chromedriver)
 
         action_bar = ttk.Frame(body)
-        action_bar.grid(row=7, column=0, columnspan=3, sticky="ew", pady=(14, 10))
+        action_bar.grid(row=6, column=0, columnspan=3, sticky="ew", pady=(14, 10))
         action_bar.columnconfigure(0, weight=1)
 
-        ttk.Label(action_bar, text="Kosongkan Download Folder untuk default ke Downloads\\CoretaxSlips. Kosongkan ChromeDriver Path kecuali diminta IT.").grid(row=0, column=0, sticky="w")
+        ttk.Label(action_bar, text="Kosongkan Download Folder untuk default ke Downloads\\CoretaxSlips.").grid(row=0, column=0, sticky="w")
         self.start_button = ttk.Button(action_bar, text="Mulai Download", command=self.start_download)
         self.start_button.grid(row=0, column=1, sticky="e", padx=(12, 0))
 
         log_frame = ttk.LabelFrame(body, text="Log Proses", padding=8)
-        log_frame.grid(row=8, column=0, columnspan=3, sticky="nsew")
+        log_frame.grid(row=7, column=0, columnspan=3, sticky="nsew")
         log_frame.columnconfigure(0, weight=1)
         log_frame.rowconfigure(0, weight=1)
 
@@ -156,14 +153,6 @@ class CoretaxApp:
         selected = filedialog.askdirectory(title="Pilih folder download")
         if selected:
             self.vars["download_dir"].set(selected)
-
-    def _browse_chromedriver(self) -> None:
-        selected = filedialog.askopenfilename(
-            title="Pilih chromedriver.exe",
-            filetypes=(("ChromeDriver", "chromedriver.exe"), ("Executable", "*.exe"), ("All files", "*.*")),
-        )
-        if selected:
-            self.vars["chromedriver_path"].set(selected)
 
     def _setup_logging(self) -> None:
         root_logger = logging.getLogger()
@@ -193,6 +182,7 @@ class CoretaxApp:
         config["browser_headless"] = False
         config["selenium_timeout"] = int(config.get("selenium_timeout") or 20)
         config["captcha_retry"] = int(config.get("captcha_retry") or 5)
+        config.pop("chromedriver_path", None)
         return config
 
     def _run_download(self, target_period: str) -> None:

@@ -58,7 +58,6 @@ Downloads\CoretaxSlips
 ## Field Opsional
 
 - `Download Folder`: boleh dikosongkan. Jika kosong, hasil PDF masuk ke `Downloads\CoretaxSlips`.
-- `ChromeDriver Path`: boleh dikosongkan. Isi hanya kalau ChromeDriver auto-detect gagal dan IT memberi file `chromedriver.exe`.
 
 ## Catatan
 

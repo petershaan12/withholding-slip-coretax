@@ -6,7 +6,13 @@ py -3 -m venv venv || goto :error
 "venv\Scripts\python.exe" -m pip install --upgrade pip || goto :error
 "venv\Scripts\python.exe" -m pip install -r requirements.txt pyinstaller || goto :error
 
-"venv\Scripts\pyinstaller.exe" --clean --onedir --name CoretaxSlip --windowed gui.py || goto :error
+"venv\Scripts\pyinstaller.exe" --clean --onedir --name CoretaxSlip --windowed ^
+  --hidden-import selenium.webdriver.chrome.webdriver ^
+  --hidden-import selenium.webdriver.chrome.service ^
+  --hidden-import selenium.webdriver.chrome.options ^
+  --hidden-import selenium.webdriver.common.selenium_manager ^
+  --hidden-import selenium.webdriver.common.driver_finder ^
+  gui.py || goto :error
 
 copy /Y config.template.json "dist\CoretaxSlip\config.template.json" >nul
 if not exist "dist\CoretaxSlip\config.json" copy /Y config.template.json "dist\CoretaxSlip\config.json" >nul

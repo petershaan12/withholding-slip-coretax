@@ -2,9 +2,8 @@ import platform
 from pathlib import Path
 from shutil import which
 
-from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.webdriver import WebDriver as ChromeDriver
 
 from core.settings import settings
 
@@ -39,7 +38,7 @@ def _resolve_chrome_binary() -> str | None:
     return None
 
 
-def create_driver() -> webdriver.Chrome:
+def create_driver() -> ChromeDriver:
     opts = Options()
     chrome_binary = _resolve_chrome_binary()
     if chrome_binary:
@@ -62,11 +61,4 @@ def create_driver() -> webdriver.Chrome:
             "safebrowsing.enabled": True,
         },
     )
-    driver_path = settings.chromedriver_path
-    if driver_path:
-        candidate = Path(driver_path).expanduser()
-        if candidate.is_file():
-            service = Service(str(candidate))
-            return webdriver.Chrome(service=service, options=opts)
-
-    return webdriver.Chrome(options=opts)
+    return ChromeDriver(options=opts)

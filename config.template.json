@@ -6,7 +6,6 @@
   "tenant_name": "CYBERINDO MEGA PERSADA",
   "tenant_npwp": "0032779977063000",
   "download_dir": "",
-  "chromedriver_path": "",
   "browser_headless": false,
   "selenium_timeout": 20,
   "captcha_retry": 5

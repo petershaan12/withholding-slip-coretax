@@ -65,7 +65,6 @@ class Settings:
     tenant_name: Optional[str]
     tenant_npwp: Optional[str]
     download_dir: Path
-    chromedriver_path: Optional[str]
     session_file: Path
     browser_headless: bool
     selenium_timeout: int
@@ -88,7 +87,6 @@ class Settings:
             ("Tenant Name", self.tenant_name or "-"),
             ("Tenant NPWP", self.tenant_npwp or "-"),
             ("Download Dir", self.download_dir),
-            ("ChromeDriver", self.chromedriver_path),
             ("Session File", self.session_file),
             ("Headless", self.browser_headless),
             ("Timeout", f"{self.selenium_timeout}s"),
@@ -121,7 +119,6 @@ def load_settings() -> Settings:
         tenant_name=_optional_str(config, "tenant_name") or None,
         tenant_npwp=_optional_str(config, "tenant_npwp") or None,
         download_dir=_resolve_download_dir(config),
-        chromedriver_path=_optional_str(config, "chromedriver_path") or None,
         session_file=BASE_DIR / ".session" / "coretax_cookies.json",
         browser_headless=_optional_bool(config, "browser_headless", default=False),
         selenium_timeout=_optional_int(config, "selenium_timeout", default=20),
